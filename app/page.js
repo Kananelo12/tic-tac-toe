@@ -1,103 +1,81 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import Square from "@/components/Square";
+import { useState } from "react";
+
+export default function Board() {
+  const [squares, setSquares] = useState(Array(9).fill(null));
+  const [isXNext, setIsXNext] = useState(true);
+
+  /**
+   * Handles a click on square at index i.
+   * Returns early if that square is filled or if there's already a winner.
+   */
+  const handleSquareClick = (i) => {
+    if (squares[i] || determineWinner(squares)) {
+      return; // ignore clicks on occupied squares or after game end
+    }
+
+    // 
+    const newSquares = squares.slice();
+    newSquares[i] = isXNext ? "X" : "O";
+    setSquares(newSquares);
+    setIsXNext(prev => !prev); // Toggle
+  }
+
+  // Determine if there's a winner based on current board
+  const winner = determineWinner(squares);
+  let status = winner ? `Winner: ${winner}` : `Next Player: ${isXNext ? "X" : "O"}`;
+
+  /**
+   * Checks all winning patterns for a 3×3 Tic‑Tac‑Toe board.
+   * Returns 'X' or 'O' if a winning line is found, otherwise null.
+   */
+  function determineWinner(squaresArray) {
+    const winPatterns = [
+      [0, 1, 2], // Rows
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6], // Patterns
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8], // Diagonals
+      [2, 4, 6]
+    ];
+
+    // Iterate over all possible win patterns
+    for (let i = 0; i < winPatterns.length; i++) {
+      // Array destructuring
+      const [a, b, c] = winPatterns[i];
+
+      // Check if all three squares are the same non-null value
+      if (squaresArray[a] && squaresArray[a] === squaresArray[b] && squaresArray[a] === squaresArray[c]) {
+        return squaresArray[a];
+      }
+    }
+    return null;
+  }
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="flex-1 h-screen flex items-center justify-center">
+      <div className="board">
+        <div className="">{status}</div>
+        <div className="board-row">
+          <Square value={squares[0]} onSquareClick={() => handleSquareClick(0)} />
+          <Square value={squares[1]} onSquareClick={() => handleSquareClick(1)} />
+          <Square value={squares[2]} onSquareClick={() => handleSquareClick(2)} />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <div className="board-row">
+          <Square value={squares[3]} onSquareClick={() => handleSquareClick(3)} />
+          <Square value={squares[4]} onSquareClick={() => handleSquareClick(4)} />
+          <Square value={squares[5]} onSquareClick={() => handleSquareClick(5)} />
+        </div>
+        <div className="board-row">
+          <Square value={squares[6]} onSquareClick={() => handleSquareClick(6)} />
+          <Square value={squares[7]} onSquareClick={() => handleSquareClick(7)} />
+          <Square value={squares[8]} onSquareClick={() => handleSquareClick(8)} />
+        </div>
+      </div>
     </div>
   );
 }
