@@ -26,7 +26,6 @@ export default function Board() {
   const isDraw = () => {
     let counter = 0;
     for (let i = 0; i < squares.length; i++) {
-      console.log("Square Value " + squares[i]);
       if (squares[i] !== null) {
         counter++;
       }
@@ -98,9 +97,9 @@ export default function Board() {
         ))}
 
         <div className="player w-full flex__center mt-3">
-          <div className="flex justify-center shadow rounded-full mt-4 border border-gray-100">
+          <div className="flex justify-center shadow-xl rounded-full mt-4 border border-gray-100">
             <div
-              className={`flex__center w-[40px] h-[40px] rounded-full ${
+              className={`flex__center w-[50px] h-[50px] rounded-full ${
                 isXNext
                   ? "bg-teal-500 text-white" 
                   : "text-gray-600"
@@ -109,7 +108,7 @@ export default function Board() {
               X
             </div>
             <div
-              className={`flex__center w-[40px] h-[40px] rounded-full ${
+              className={`flex__center w-[50px] h-[50px] rounded-full ${
                 !isXNext
                   ? "bg-teal-500 text-white"
                   : "text-gray-600"
