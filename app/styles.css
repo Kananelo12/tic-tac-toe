@@ -49,6 +49,11 @@ ul {
 * {
   box-sizing: border-box;
 }
+.flex__center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 body {
   font-family: sans-serif;

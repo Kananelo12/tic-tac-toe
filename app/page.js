@@ -12,20 +12,35 @@ export default function Board() {
    * Returns early if that square is filled or if there's already a winner.
    */
   const handleSquareClick = (i) => {
-    if (squares[i] || determineWinner(squares)) {
+    if (squares[i] || winner) {
       return; // ignore clicks on occupied squares or after game end
     }
 
-    // 
+    // Avoid mutating original array
     const newSquares = squares.slice();
     newSquares[i] = isXNext ? "X" : "O";
     setSquares(newSquares);
-    setIsXNext(prev => !prev); // Toggle
-  }
+    setIsXNext((prev) => !prev); // Toggle turn to next player
+  };
+
+  const isDraw = () => {
+    let counter = 0;
+    for (let i = 0; i < squares.length; i++) {
+      console.log("Square Value " + squares[i]);
+      if (squares[i] !== null) {
+        counter++;
+      }
+    }
+    if (counter !== 9) return false;
+    return true;
+  };
+
+  const draw = isDraw();
 
   // Determine if there's a winner based on current board
-  const winner = determineWinner(squares);
-  let status = winner ? `Winner: ${winner}` : `Next Player: ${isXNext ? "X" : "O"}`;
+  const { player: winner, line: winningLine } = determineWinner(squares);
+
+  // let status = winner ? `Winner: ${winner}` : `Next Player: ${isXNext ? "X" : "O"}`;
 
   /**
    * Checks all winning patterns for a 3×3 Tic‑Tac‑Toe board.
@@ -40,7 +55,7 @@ export default function Board() {
       [1, 4, 7],
       [2, 5, 8],
       [0, 4, 8], // Diagonals
-      [2, 4, 6]
+      [2, 4, 6],
     ];
 
     // Iterate over all possible win patterns
@@ -49,31 +64,71 @@ export default function Board() {
       const [a, b, c] = winPatterns[i];
 
       // Check if all three squares are the same non-null value
-      if (squaresArray[a] && squaresArray[a] === squaresArray[b] && squaresArray[a] === squaresArray[c]) {
-        return squaresArray[a];
+      if (
+        squaresArray[a] &&
+        squaresArray[a] === squaresArray[b] &&
+        squaresArray[a] === squaresArray[c]
+      ) {
+        // return both the winner and their winning combo
+        return { player: squaresArray[a], line: winPatterns[i] };
       }
     }
-    return null;
+    return { player: null, line: [] };
   }
 
   return (
     <div className="flex-1 h-screen flex items-center justify-center">
       <div className="board">
-        <div className="">{status}</div>
-        <div className="board-row">
-          <Square value={squares[0]} onSquareClick={() => handleSquareClick(0)} />
-          <Square value={squares[1]} onSquareClick={() => handleSquareClick(1)} />
-          <Square value={squares[2]} onSquareClick={() => handleSquareClick(2)} />
+        {[0, 1, 2].map((row) => (
+          <div key={row} className="board-row">
+            {[0, 1, 2].map((col) => {
+              const idx = row * 3 + col;
+              const highlight = winningLine.includes(idx) ? "bg-teal-500" : "";
+              return (
+                <Square
+                  key={idx}
+                  value={squares[idx]}
+                  onSquareClick={() => handleSquareClick(idx)}
+                  isDisabled={winner}
+                  otherStyles={highlight}
+                />
+              );
+            })}
+          </div>
+        ))}
+
+        <div className="player w-full flex__center mt-3">
+          <div className="flex justify-center shadow rounded-full mt-4 border border-gray-100">
+            <div
+              className={`flex__center w-[40px] h-[40px] rounded-full ${
+                isXNext
+                  ? "bg-teal-500 text-white" 
+                  : "text-gray-600"
+              }`}
+            >
+              X
+            </div>
+            <div
+              className={`flex__center w-[40px] h-[40px] rounded-full ${
+                !isXNext
+                  ? "bg-teal-500 text-white"
+                  : "text-gray-600"
+              }`}
+            >
+              O
+            </div>
+          </div>
         </div>
-        <div className="board-row">
-          <Square value={squares[3]} onSquareClick={() => handleSquareClick(3)} />
-          <Square value={squares[4]} onSquareClick={() => handleSquareClick(4)} />
-          <Square value={squares[5]} onSquareClick={() => handleSquareClick(5)} />
-        </div>
-        <div className="board-row">
-          <Square value={squares[6]} onSquareClick={() => handleSquareClick(6)} />
-          <Square value={squares[7]} onSquareClick={() => handleSquareClick(7)} />
-          <Square value={squares[8]} onSquareClick={() => handleSquareClick(8)} />
+
+        <div className="reset-btn">
+          {(winner || draw) && (
+            <button
+              className="bg-slate-800 text-white w-full rounded-sm mt-5 p-2 cursor-pointer"
+              onClick={() => setSquares(Array(9).fill(null))}
+            >
+              Reset
+            </button>
+          )}
         </div>
       </div>
     </div>
