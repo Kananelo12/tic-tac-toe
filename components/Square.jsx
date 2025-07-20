@@ -1,12 +1,10 @@
+"use client";
+
 import React from "react";
 
-const Square = ({ value, onSquareClick, isDisabled, otherStyles }) => {
+const Square = ({ value, onSquareClick, otherStyles }) => {
   return (
-    <button
-      onClick={onSquareClick}
-      disabled={isDisabled}
-      className={`square ${otherStyles}`}
-    >
+    <button onClick={onSquareClick} className={`square ${otherStyles}`}>
       {value}
     </button>
   );
